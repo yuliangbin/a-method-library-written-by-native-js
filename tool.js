@@ -1,13 +1,13 @@
-//使用惰性思想(JS高级编程技巧之一)来封装我们的常用方法库：在第一次给utils赋值的时候，已经把兼容给处理好了，把最后的结果存放在flag变量中，以后在每一个方法中，只要是IE6-8不兼容的，我们不需要重复验证,只需要使用flag的值即可。
+
 var tools = (function () {
 	let flag = "getComputedStyle" in window;
 	
 	//将一个类数组或数组转换成数组的格式
 	function listToArray(likeArray){
 		let arr = [];
-		try {
+		if (flag) {
 			Array.prototype.slice.call(likeArray);
-		} catch (e){//DOM元素集合是类数组，但在IE6-8下不能使用slice方法
+		} else{//DOM元素集合是类数组，但在IE6-8下不能使用slice方法
 			for(let i = 0; i < likeArray.length; i++){
 				arr[i] = likeArray[i];
 			}
@@ -272,11 +272,12 @@ var tools = (function () {
 	
 	//获取 单独设置 批量设置当前元素(curEle)的样式值
 	function css(curEle) {
-		var argTwo = arguments[1],arr = Array.prototype.slice.call(arguments,1);
+		var argTwo = arguments[1],
+			arr = Array.prototype.slice.call(arguments,1);
 		if (typeof(argTwo) === "string") {
 		//这个参数是一个字符串，这样的话有可能就是在获取样式；为什么说是有可能呢？因为还需要判断是否存在第三个参数，如果第三个参数存在，就不是获取样式，而是单独设置样式。
 			var argThree = arguments[2];
-			if (!argThree) { //第三个参数不存在
+			if (typeof argThree === 'undefined') { //第三个参数不存在
 				return getCss.apply(curEle,arr);//为了方便，可以把整个arr直接传递进去
 			} else {
 				return setCss.apply(curEle,arr);
